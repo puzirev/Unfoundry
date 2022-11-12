@@ -1,0 +1,11 @@
+
+packages/*
+Unfoundry/.vs/*
+Unfoundry/obj/*
+Unfoundry/bin/*
+Libraries/*.dll
+.vs/*
+MigrationBackup/*
+Libraries/assembly-hash.txt
+Libraries/MethodAddressToToken.db
+Libraries/MethodXrefScanCache.db

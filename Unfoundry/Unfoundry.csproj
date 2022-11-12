@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{43FFCD1C-85A3-487D-9166-03C615684C15}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Unfoundry</RootNamespace>
+    <AssemblyName>Unfoundry</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>G:\foundry\BepInEx\core\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Core">
+      <HintPath>G:\foundry\BepInEx\core\BepInEx.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.IL2CPP">
+      <HintPath>G:\foundry\BepInEx\core\BepInEx.IL2CPP.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>G:\foundry\BepInEx\unhollowed\Il2Cppmscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem">
+      <HintPath>G:\foundry\BepInEx\unhollowed\Il2CppSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Main">
+      <HintPath>G:\foundry\BepInEx\unhollowed\Main.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnhollowerBaseLib">
+      <HintPath>G:\foundry\BepInEx\core\UnhollowerBaseLib.dll</HintPath>
+    </Reference>
+    <Reference Include="UnhollowerRuntimeLib">
+      <HintPath>G:\foundry\BepInEx\core\UnhollowerRuntimeLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>G:\foundry\BepInEx\unhollowed\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextCoreModule">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.TextCoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIElementsModule">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.UIElementsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>G:\foundry\BepInEx\unhollowed\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActionManager.cs" />
+    <Compile Include="AssetBundleProxy.cs" />
+    <Compile Include="BatchRenderingGroup.cs" />
+    <Compile Include="BatchRenderingHandle.cs" />
+    <Compile Include="CommonEvents.cs" />
+    <Compile Include="ConfirmationFrame.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="LazySprite.cs" />
+    <Compile Include="PathHelpers.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="BuildableObjectGOExtensions.cs" />
+    <Compile Include="CancellableEventArgs.cs" />
+    <Compile Include="ConstructionTaskGroup.cs" />
+    <Compile Include="CustomHandheldMode.cs" />
+    <Compile Include="CustomHandheldModeManager.cs" />
+    <Compile Include="CustomRadialMenu.cs" />
+    <Compile Include="CustomRadialMenuStateControl.cs" />
+    <Compile Include="InputHelpers.cs" />
+    <Compile Include="LazyIconSprite.cs" />
+    <Compile Include="LazyMaterial.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RenderBatchWithColors.cs" />
+    <Compile Include="ResourceExt.cs" />
+    <Compile Include="TabletHelper.cs" />
+    <Compile Include="UIBuilder.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y $(TargetPath) G:\foundry\BepInEx\plugins\</PostBuildEvent>
+  </PropertyGroup>
+</Project>
