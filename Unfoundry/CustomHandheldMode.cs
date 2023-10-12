@@ -1,7 +1,6 @@
-﻿using UnhollowerBaseLib;
+﻿using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static Unfoundry.Plugin;
 
 namespace Unfoundry
 {
@@ -56,12 +55,12 @@ namespace Unfoundry
             edgeMatrices[9] = buildEdgeMatrix(v2, v6);
             edgeMatrices[10] = buildEdgeMatrix(v3, v7);
             edgeMatrices[11] = buildEdgeMatrix(v4, v8);
-            Graphics.DrawMeshInstanced(ResourceDB.mesh_cubeCenterPivot, 0, edgeMaterial, edgeMatrices, 12, null, ShadowCastingMode.Off, false, GlobalStaticCache.s_Layer_DragHelper, Camera.main, LightProbeUsage.Off);
+            Graphics.DrawMeshInstanced(ResourceDB.mesh_cubeCenterPivot, 0, edgeMaterial, edgeMatrices, 12, null, ShadowCastingMode.Off, false, GlobalStaticCache.s_Layer_DragHelper, Camera.main, LightProbeUsage.Off, null);
         }
 
         protected static void DrawArrow(Vector3 origin, Vector3 direction, Material material, float scale = 1.0f, float offset = 0.5f)
         {
-            Matrix4x4 matrix = Matrix4x4.TRS(origin + direction * offset, Quaternion.LookRotation(direction) * Quaternion.EulerRotation(0.0f, Mathf.PI * 0.5f, 0.0f), Vector3.one * scale);
+            Matrix4x4 matrix = Matrix4x4.TRS(origin + direction * offset, Quaternion.LookRotation(direction) * Quaternion.Euler(0.0f, 90.0f, 0.0f), Vector3.one * scale);
             Graphics.DrawMesh(ResourceDB.resourceLinker.mesh_arrow_centerPivot, matrix, material, GlobalStaticCache.s_Layer_DragHelper, Camera.main, 0, null, false, false, false);
         }
 
@@ -77,15 +76,15 @@ namespace Unfoundry
             if (Physics.Raycast(lookRay, out hitInfo, 300.0f, GlobalStaticCache.s_LayerMask_Terrain | GlobalStaticCache.s_LayerMask_TerrainTileCollider | GlobalStaticCache.s_LayerMask_BuildableObjectFullSize | GlobalStaticCache.s_LayerMask_BuildableObjectPartialSize))
             {
                 targetPoint = hitInfo.point;
-                var normal = GameRoot.SnappedToNearestAxis(hitInfo.normal);
-                targetCoord = Vector3Int.FloorToInt(targetPoint + normal * offset);
+                var normal = Plugin.SnappedToNearestAxis(hitInfo.normal);
+                targetCoord = new Vector3Int(Mathf.FloorToInt(hitInfo.point.x + normal.x * offset), Mathf.FloorToInt(hitInfo.point.y + normal.y * offset), Mathf.FloorToInt(hitInfo.point.z + normal.z * offset));
                 targetNormal = new Vector3Int(Mathf.RoundToInt(normal.x), Mathf.RoundToInt(normal.y), Mathf.RoundToInt(normal.z));
                 return true;
             }
 
             targetPoint = Vector3.zero;
             targetCoord = Vector3Int.zero;
-            targetNormal = Vector3Int.up;
+            targetNormal = new Vector3Int(0, 1, 0);
             return false;
         }
 
@@ -95,8 +94,8 @@ namespace Unfoundry
             RaycastHit hitInfo;
             if (Physics.Raycast(lookRay, out hitInfo, 30.0f, GlobalStaticCache.s_LayerMask_Terrain | GlobalStaticCache.s_LayerMask_TerrainTileCollider | GlobalStaticCache.s_LayerMask_BuildableObjectFullSize | GlobalStaticCache.s_LayerMask_BuildableObjectPartialSize))
             {
-                var normal = GameRoot.SnappedToNearestAxis(hitInfo.normal);
-                targetCoord = Vector3Int.FloorToInt(hitInfo.point + normal * offset);
+                var normal = Plugin.SnappedToNearestAxis(hitInfo.normal);
+                targetCoord = new Vector3Int(Mathf.FloorToInt(hitInfo.point.x + normal.x * offset), Mathf.FloorToInt(hitInfo.point.y + normal.y * offset), Mathf.FloorToInt(hitInfo.point.z + normal.z * offset));
                 return true;
             }
 
@@ -116,7 +115,7 @@ namespace Unfoundry
         public static float BoxRayIntersection(Vector3 from, Vector3 to, Ray ray, out Vector3Int normal, out int faceIndex)
         {
             float dist;
-            if (Bounds.IntersectRayAABB(ray, new Bounds((from + to) * 0.5f, to - from), out dist))
+            if (new Bounds((from + to) * 0.5f, to - from).IntersectRay(ray, out dist))
             {
                 float maxDistance = -1.0f;
                 normal = Vector3Int.zero;
@@ -142,7 +141,7 @@ namespace Unfoundry
             }
 
             faceIndex = -1;
-            normal = Vector3Int.up;
+            normal = new Vector3Int(0, 1, 0);
             return -1.0f;
         }
 
@@ -167,7 +166,7 @@ namespace Unfoundry
         {
             var shader = material.shader;
             int count = shader.GetPropertyCount();
-            log.LogMessage((string)$"============== {shader.name} ===============");
+            Debug.Log((string)$"============== {shader.name} ===============");
             for (int i = 0; i < count; ++i)
             {
                 string value;
@@ -177,7 +176,7 @@ namespace Unfoundry
                         value = material.GetColor(shader.GetPropertyName(i)).ToString();
                         break;
                     case ShaderPropertyType.Vector:
-                        value = material.GetVector(shader.GetPropertyName(i)).ToString();
+                        value = material.GetVector(Shader.PropertyToID(shader.GetPropertyName(i))).ToString();
                         break;
                     case ShaderPropertyType.Float:
                     case ShaderPropertyType.Range:
@@ -191,7 +190,7 @@ namespace Unfoundry
                         value = "<undefined>";
                         break;
                 }
-                log.LogMessage((string)$"{shader.GetPropertyType(i)} {shader.GetPropertyName(i)} = {value}");
+                Debug.Log((string)$"{shader.GetPropertyType(i)} {shader.GetPropertyName(i)} = {value}");
             }
         }
     }

@@ -34,7 +34,7 @@ namespace Unfoundry
                 OnGameInitializationDone?.Invoke();
             }
 
-            [HarmonyPatch(typeof(InputProxy), nameof(InputProxy.Update))]
+            [HarmonyPatch(typeof(GameCamera), nameof(GameCamera.Update))]
             [HarmonyPrefix]
             private static void Update()
             {
@@ -42,7 +42,7 @@ namespace Unfoundry
                 ActionManager.Update();
             }
 
-            [HarmonyPatch(typeof(GameRoot), nameof(GameRoot.LateUpdate))]
+            [HarmonyPatch(typeof(GameRoot), "LateUpdate")]
             [HarmonyPrefix]
             private static void LateUpdate()
             {
@@ -64,7 +64,7 @@ namespace Unfoundry
                 OnDeselectTool?.Invoke();
             }
 
-            [HarmonyPatch(typeof(GameRoot), nameof(GameRoot.keyHandler_rotateY))]
+            [HarmonyPatch(typeof(GameRoot), "keyHandler_rotateY")]
             [HarmonyPrefix]
             private static bool GameRoot_keyHandler_rotateY()
             {

@@ -16,7 +16,7 @@ namespace Unfoundry
 
             confirmDestroyFrame = Object.Instantiate(ResourceDB.ui_destroyItemConfirmation, GlobalStateManager.getDefaultUICanvasTransform(true), false).GetComponent<DestroyItemConfirmationFrame>();
             confirmDestroyFrame.uiText_message.setText(text);
-            confirmDestroyFrame.itemTemplateToDestroyId = 0;
+            Traverse.Create(confirmDestroyFrame).Field("itemTemplateToDestroyId").SetValue((ulong)0);
             ConfirmationFrame.onConfirm = onConfirm;
             ConfirmationFrame.onCancel = onCancel;
 
@@ -43,7 +43,7 @@ namespace Unfoundry
             [HarmonyPrefix]
             private static bool DestroyItemConfirmationFrame_destroyOnClick(DestroyItemConfirmationFrame __instance)
             {
-                if (__instance.itemTemplateToDestroyId != 0 || onConfirm == null) return true;
+                if (Traverse.Create(__instance).Field("itemTemplateToDestroyId").GetValue<ulong>() != 0 || onConfirm == null) return true;
 
                 onConfirm.Invoke();
                 onConfirm = onCancel = null;
@@ -57,7 +57,7 @@ namespace Unfoundry
             [HarmonyPrefix]
             private static bool DestroyItemConfirmationFrame_cancelOnClick(DestroyItemConfirmationFrame __instance)
             {
-                if (__instance.itemTemplateToDestroyId != 0 || onCancel == null) return true;
+                if (Traverse.Create(__instance).Field("itemTemplateToDestroyId").GetValue<ulong>() != 0 || onCancel == null) return true;
 
                 onCancel.Invoke();
                 onConfirm = onCancel = null;

@@ -1,12 +1,8 @@
 ﻿using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using static Unfoundry.Plugin;
-using static Il2CppSystem.Globalization.CultureInfo;
 
 namespace Unfoundry
 {
@@ -21,6 +17,8 @@ namespace Unfoundry
 
         public static int RegisterMode(CustomHandheldMode mode)
         {
+            Debug.Log($"Registering custom handheld mode #{FirstCustomIndex + customHandheldModes.Count}");
+
             customHandheldModes.Add(mode);
             return FirstCustomIndex + customHandheldModes.Count - 1;
         }
@@ -39,9 +37,20 @@ namespace Unfoundry
             {
                 clientData.setEquipmentMode(defaultMode);
             }
-
         }
 
+        public static void ExitCurrentMode(ItemTemplate itemTemplate)
+        {
+            Debug.Log($"Deselecting custom handheld to select {itemTemplate.identifier}");
+
+            ExitCurrentMode(GameRoot.getClientCharacter());
+        }
+        public static void ExitCurrentMode2()
+        {
+            Debug.Log($"Deselecting custom handheld");
+
+            ExitCurrentMode(GameRoot.getClientCharacter());
+        }
         public static void ExitCurrentMode() => ExitCurrentMode(GameRoot.getClientCharacter());
         public static void ExitCurrentMode(ulong usernameHash) => ExitCurrentMode(CharacterManager.getByUsernameHash(usernameHash));
         public static void ExitCurrentMode(Character character)
@@ -70,7 +79,11 @@ namespace Unfoundry
         public static HandheldData GetHandheldData(ulong usernameHash)
         {
             HandheldData data;
-            if (!handheldData.TryGetValue(usernameHash, out data)) handheldData[usernameHash] = data = new HandheldData(0);
+            if (!handheldData.TryGetValue(usernameHash, out data))
+            {
+                Debug.Log($"Creating userdata for {usernameHash}");
+                handheldData[usernameHash] = data = new HandheldData(0);
+            }
             return data;
         }
 
@@ -104,8 +117,8 @@ namespace Unfoundry
             {
                 if (!__instance.relatedCharacter.sessionOnly_isClientCharacter) return true;
 
-                int equipmentMode = __instance.relatedCharacter.saveSyncData.equipmentMode;
-                if (equipmentMode != 0 && __instance.currentlySetMode != equipmentMode) return true;
+                int equipmentMode = __instance.relatedCharacter.saveSyncData.getEquipmentMode();
+                if (equipmentMode != 0 && Traverse.Create(__instance).Field("currentlySetMode").GetValue<int>() != equipmentMode) return true;
 
                 HandheldData data = GetHandheldData(__instance.relatedCharacter);
                 if (data.CurrentlySetMode < FirstCustomIndex) return true;
@@ -175,8 +188,8 @@ namespace Unfoundry
                 HandheldData data = GetHandheldData(__instance.relatedCharacter);
                 if (data.CurrentlySetMode >= FirstCustomIndex)
                 {
-                    __instance.currentlySetMode = 1;
-                    __instance.relatedCharacter.clientData.equipmentMode = 1;
+                    Traverse.Create(__instance).Field("currentlySetMode").SetValue(1);
+                    Traverse.Create(__instance.relatedCharacter.clientData).Field("equipmentMode").SetValue(1);
                     customHandheldModes[data.CurrentlySetMode - FirstCustomIndex].Enter();
                     return false;
                 }
@@ -190,7 +203,7 @@ namespace Unfoundry
             [HarmonyPrefix]
             private static void ClientData_setEquippedItemTemplate(Character.ClientData __instance, ItemTemplate itemTemplate)
             {
-                if (itemTemplate != null) ExitCurrentMode();
+                if (itemTemplate != null) ExitCurrentMode(itemTemplate);
             }
 
             [HarmonyPatch(typeof(Character.ClientData), nameof(Character.ClientData.setEquipmentMode))]
@@ -206,16 +219,18 @@ namespace Unfoundry
                 IsCustomHandheldModeActive = true;
 
                 __instance.setBuildModeIntoCopyWithSettingsMode(null);
-                if (modeToSet != 0 && __instance.equippedItem != null) __instance.setEquippedItemTemplate(null);
-                __instance.equipmentMode = modeToSet;
+                if (modeToSet != 0 && __instance.getEquippedItemTemplate() != null) __instance.setEquippedItemTemplate(null);
+                Traverse.Create(__instance).Field("equipmentMode").SetValue(modeToSet);
                 if (modeToSet != 0) GameRoot.characterEquipmentModeChangeUnlockCallback(modeToSet);
-                IconShortcutHelper.singleton.RefreshIcons();
+                IconShortcutHelper.Refresh();
 
                 var character = GameRoot.getTabletHH().relatedCharacter;
                 Debug.Assert(character != null);
                 Character.SaveSync_EquipmentMode syncEquipmentMode = new Character.SaveSync_EquipmentMode(character.usernameHash, modeToSet);
 
                 GameRoot.addLockstepEvent(syncEquipmentMode);
+
+                Debug.Log($"Set equipment mode to {modeToSet}");
 
                 return false;
             }

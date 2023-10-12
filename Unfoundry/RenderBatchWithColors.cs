@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static Il2CppSystem.Uri;
 
 namespace Unfoundry
 {
@@ -32,7 +31,7 @@ namespace Unfoundry
                 int thisBatchSize = (i == lastBatchIndex) ? nextSubIndex : batchSize;
                 total += thisBatchSize;
 
-                materialPropertyBlocks[i].SetVectorArray(colorNameId, colorBatches[i], batchSize); // ToDo: use dirty flags
+                materialPropertyBlocks[i].SetVectorArray(colorNameId, colorBatches[i]); // ToDo: use dirty flags
                 for (int subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++)
                 {
                     if (prepassMaterial != null)
@@ -97,7 +96,10 @@ namespace Unfoundry
             positionColumn.x += offset.x;
             positionColumn.y += offset.y;
             positionColumn.z += offset.z;
-            matrix.SetColumn(3, positionColumn);
+            matrix[0, 3] = positionColumn.x;
+            matrix[1, 3] = positionColumn.y;
+            matrix[2, 3] = positionColumn.z;
+            matrix[3, 3] = positionColumn.w;
 
             transformBatches[index][subIndex] = matrix;
         }
@@ -114,7 +116,10 @@ namespace Unfoundry
                     positionColumn.x += offset.x;
                     positionColumn.y += offset.y;
                     positionColumn.z += offset.z;
-                    matrix.SetColumn(3, positionColumn);
+                    matrix[0, 3] = positionColumn.x;
+                    matrix[1, 3] = positionColumn.y;
+                    matrix[2, 3] = positionColumn.z;
+                    matrix[3, 3] = positionColumn.w;
 
                     transformBatches[i][j] = matrix;
                 }

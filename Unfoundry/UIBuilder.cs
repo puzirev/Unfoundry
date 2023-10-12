@@ -57,7 +57,7 @@ namespace Unfoundry
 
         public UIBuilder SetOffsets(float offsetMinX, float offsetMinY, float offsetMaxX, float offsetMaxY)
         {
-            var transform = GameObject.transform.Cast<RectTransform>();
+            var transform = (RectTransform)GameObject.transform;
             transform.offsetMin = new Vector2(offsetMinX, offsetMinY);
             transform.offsetMax = new Vector2(offsetMaxX, offsetMaxY);
             return this;
@@ -65,14 +65,14 @@ namespace Unfoundry
 
         public UIBuilder SetPivot(float pivotX, float pivotY)
         {
-            var transform = GameObject.transform.Cast<RectTransform>();
+            var transform = (RectTransform)GameObject.transform;
             transform.pivot = new Vector2(pivotX, pivotY);
             return this;
         }
 
         public UIBuilder SetAnchor(float anchorMinX, float anchorMinY, float anchorMaxX, float anchorMaxY)
         {
-            var transform = GameObject.transform.Cast<RectTransform>();
+            var transform = (RectTransform)GameObject.transform;
             transform.anchorMin = new Vector2(anchorMinX, anchorMinY);
             transform.anchorMax = new Vector2(anchorMaxX, anchorMaxY);
             return this;
@@ -88,8 +88,8 @@ namespace Unfoundry
 
         public UIBuilder SetRotation(float degrees)
         {
-            var transform = GameObject.transform.Cast<RectTransform>();
-            transform.rotation = Quaternion.EulerAngles(0.0f, 0.0f, degrees * Mathf.Deg2Rad);
+            var transform = (RectTransform)GameObject.transform;
+            transform.rotation = Quaternion.Euler(0.0f, 0.0f, degrees);
             return this;
         }
 
@@ -152,7 +152,7 @@ namespace Unfoundry
 
         public UIBuilder Element(string name)
         {
-            var gameObject = new GameObject(name, UnhollowerRuntimeLib.Il2CppType.Of<RectTransform>());
+            var gameObject = new GameObject(name, typeof(RectTransform));
             if (GameObject != null) gameObject.transform.SetParent(GameObject.transform, false);
 
             UIBuilder elementBuilder = new UIBuilder();
@@ -313,7 +313,7 @@ namespace Unfoundry
         public UIBuilder SetOnClick(OnClickDelegate action)
         {
             var button = GameObject.GetComponent<Button>();
-            if (button != null) button.onClick.AddListener((UnityAction)new Action(action));
+            if (button != null) button.onClick.AddListener(new UnityAction(action));
 
             return this;
         }
@@ -401,7 +401,7 @@ namespace Unfoundry
             component.value = value;
             component.fillRect = fillRect;
             component.handleRect = handleRect;
-            if (onValueChanged != null) component.onValueChanged.AddListener((UnityAction<float>)new Action<float>(onValueChanged));
+            if (onValueChanged != null) component.onValueChanged.AddListener(new UnityAction<float>(onValueChanged));
             return this;
         }
 

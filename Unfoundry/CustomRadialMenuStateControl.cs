@@ -76,7 +76,7 @@ namespace Unfoundry
 
             for (int i = 0; i < ulongsize; i++)
             {
-                ret.Insert(0, value & 0x1);
+                ret.Insert(0, (value & 0x1).ToString());
                 value >>= 1;
                 if (value == 0) break;
             }

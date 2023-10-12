@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Unfoundry
 {
@@ -74,7 +75,7 @@ namespace Unfoundry
 
             if (unsortedTasks.Count > 0)
             {
-                Plugin.log.LogError("Cyclic dependency loop in construction tasks");
+                Debug.LogError("Cyclic dependency loop in construction tasks");
                 sortedTasks.Clear();
                 unsortedTasks.Clear();
                 return;

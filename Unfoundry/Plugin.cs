@@ -1,28 +1,19 @@
-﻿using BepInEx;
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Reflection;
 using System;
 using Path = System.IO.Path;
-using BepInEx.Configuration;
 
 namespace Unfoundry
 {
-    [BepInPlugin(GUID, MODNAME, VERSION)]
-    public class Plugin : BepInEx.IL2CPP.BasePlugin
+    public class Plugin
     {
         public const string
             MODNAME = "Unfoundry",
             AUTHOR = "erkle64",
             GUID = "com." + AUTHOR + "." + MODNAME,
             VERSION = "0.1.0";
-
-        public static BepInEx.Logging.ManualLogSource log;
-
-        public static readonly string pluginsFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-        private static ConfigEntry<int> configMaxQueuedEventsPerFrame;
 
         public struct HandheldData
         {
@@ -36,34 +27,27 @@ namespace Unfoundry
         private static Dictionary<ulong, HandheldData> handheldData = new Dictionary<ulong, HandheldData>();
 
         private static ulong lastSpawnedBuildableWrapperEntityId = 0;
-
-        public Plugin()
+        
+        public static Vector3 SnappedToNearestAxis(Vector3 direction)
         {
-            log = Log;
+            float num1 = Mathf.Abs(direction.x);
+            float num2 = Mathf.Abs(direction.y);
+            float num3 = Mathf.Abs(direction.z);
+            if ((double)num1 > (double)num2 && (double)num1 > (double)num3)
+                return new Vector3(Mathf.Sign(direction.x), 0.0f, 0.0f);
+            return (double)num2 > (double)num1 && (double)num2 > (double)num3 ? new Vector3(0.0f, Mathf.Sign(direction.y), 0.0f) : new Vector3(0.0f, 0.0f, Mathf.Sign(direction.z));
         }
-
-        public override void Load()
-        {
-            log.LogMessage((string)$"Loading {MODNAME}");
-
-            configMaxQueuedEventsPerFrame = Config.Bind("Events", "MaxQueuedEventsPerFrame", 20, "");
-            ActionManager.MaxQueuedEventsPerFrame = Mathf.Max(1, configMaxQueuedEventsPerFrame.Value);
-
-            try
-            {
-                var harmony = new Harmony(GUID);
-                harmony.PatchAll(Assembly.GetExecutingAssembly());
-            }
-            catch (Exception e)
-            {
-                log.LogError(e.ToString());
-            }
-        }
-
 
         [HarmonyPatch]
         public static class Patch
         {
+            [HarmonyPatch(typeof(ObjectPoolManager), nameof(ObjectPoolManager.InitOnApplicationStart))]
+            [HarmonyPrefix]
+            private static void LoadPlugin(BuildEntityEvent __instance)
+            {
+                ActionManager.MaxQueuedEventsPerFrame = 20;
+            }
+
             [HarmonyPatch(typeof(BuildEntityEvent), nameof(BuildEntityEvent.processEvent))]
             [HarmonyPrefix]
             private static void BuildEntityEvent_processEvent_prefix(BuildEntityEvent __instance)
@@ -115,7 +99,7 @@ namespace Unfoundry
 
                     byte terrainType = 0;
                     ChunkManager.chunks_removeTerrainBlock(chunkIndex, blockIndex, ref terrainType);
-                    ChunkManager.flagChunkVisualsAsDirty(ChunkManager.getChunkByIdx(chunkIndex), true, true, false);
+                    ChunkManager.flagChunkVisualsAsDirty(chunkIndex, true, true);
                     return false;
                 }
 
@@ -126,8 +110,8 @@ namespace Unfoundry
             //[HarmonyPostfix]
             //private static void GameRoot_addLockstepEvent(GameRoot.LockstepEvent e)
             //{
-            //    log.LogMessage("====== GameRoot.addLockstepEvent ======");
-            //    log.LogMessage(e.getDbgInfo());
+            //    Debug.Log("====== GameRoot.addLockstepEvent ======");
+            //    Debug.Log(e.getDbgInfo());
             //}
         }
     }

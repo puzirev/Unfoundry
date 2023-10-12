@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using static Unfoundry.Plugin;
 
 namespace Unfoundry
@@ -25,7 +26,7 @@ namespace Unfoundry
             Vector3Int worldPos = new Vector3Int(target.worldBuildPos[0], target.worldBuildPos[1], target.worldBuildPos[2]);
             if (buildEvents.ContainsKey(worldPos))
             {
-                log.LogWarning((string)$"Build event already exists at {worldPos}");
+                Debug.LogWarning((string)$"Build event already exists at {worldPos}");
                 return;
             }
 
@@ -111,7 +112,7 @@ namespace Unfoundry
             prev.Next = node;
         }
 
-        internal static void Update()
+        public static void Update()
         {
             int toProcess = queuedEvents.Count;
             if (toProcess > MaxQueuedEventsPerFrame) toProcess = MaxQueuedEventsPerFrame;

@@ -235,8 +235,8 @@ namespace Unfoundry
             if (mouseOffset.sqrMagnitude > deadzone * deadzone)
             {
                 var angle = Mathf.Atan2(mouseOffset.x, mouseOffset.y);
-                if (angle < 0) angle += Mathf.PI * 2;
-                mouseHighlightedSectorIndex = Mathf.FloorToInt(angle * VisibleSectorCount / (Mathf.PI * 2.0f));
+                if (angle < 0) angle += 3.141592f * 2;
+                mouseHighlightedSectorIndex = Mathf.FloorToInt(angle * VisibleSectorCount / (3.141592f * 2.0f));
                 if (mouseHighlightedSectorIndex >= VisibleSectorCount) mouseHighlightedSectorIndex = VisibleSectorCount - 1;
             }
 
@@ -301,11 +301,11 @@ namespace Unfoundry
             Description = description;
             OnActivated = onActivated;
 
-            backgroundImage.transform.localRotation = Quaternion.EulerRotation(0.0f, 0.0f, -start * Mathf.PI * 2.0f);
+            backgroundImage.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, -start * 360.0f);
             backgroundImage.fillAmount = width;
             backgroundImage.color = CustomRadialMenuManager.defaultBackgroundColour;
 
-            var iconAngle = (start + width * 0.5f) * (Mathf.PI * 2.0f);
+            var iconAngle = (start + width * 0.5f) * (3.141592f * 2.0f);
             iconImage.sprite = icon;
             var iconCenter = new Vector2(Mathf.Sin(iconAngle), Mathf.Cos(iconAngle)) * iconCenterOffset;
             iconRectTransform.offsetMin = iconCenter - new Vector2(42.5f, 42.5f);
