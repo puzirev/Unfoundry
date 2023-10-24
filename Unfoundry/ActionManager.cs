@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
-using static Unfoundry.Plugin;
 
 namespace Unfoundry
 {

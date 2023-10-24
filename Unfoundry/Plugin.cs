@@ -2,11 +2,21 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Reflection;
-using System;
-using Path = System.IO.Path;
+using Channel3.ModKit;
 
 namespace Unfoundry
 {
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public class UnfoundryModAttribute : System.Attribute
+    {
+        public string modIdentifier;
+
+        public UnfoundryModAttribute(string modIdentifier)
+        {
+            this.modIdentifier = modIdentifier;
+        }
+    }
+
     public class Plugin
     {
         public const string
@@ -14,6 +24,26 @@ namespace Unfoundry
             AUTHOR = "erkle64",
             GUID = "com." + AUTHOR + "." + MODNAME,
             VERSION = "0.1.0";
+
+        private static Dictionary<string, UnfoundryPlugin> _unfoundryPlugins = new Dictionary<string, UnfoundryPlugin>();
+
+        [OnGameAssemblyLoad]
+        public static void FindUnfoundryMods(Assembly assembly)
+        {
+            foreach (System.Type type in assembly.GetTypes())
+            {
+                var attributes = (UnfoundryModAttribute[])type.GetCustomAttributes(typeof(UnfoundryModAttribute), true);
+                if (typeof(UnfoundryPlugin).IsAssignableFrom(type) && attributes.Length > 0)
+                {
+                    var plugin = (UnfoundryPlugin)System.Activator.CreateInstance(type);
+                    if (plugin != null)
+                    {
+                        Debug.Log($"Unfoundry instantiating plugin for {type.FullName}");
+                        _unfoundryPlugins.Add(attributes[0].modIdentifier, plugin);
+                    }
+                }
+            }
+        }
 
         public struct HandheldData
         {
@@ -46,6 +76,26 @@ namespace Unfoundry
             private static void LoadPlugin(BuildEntityEvent __instance)
             {
                 ActionManager.MaxQueuedEventsPerFrame = 20;
+
+                var allMods = ModManager.getAllMods();
+                foreach (var plugin in _unfoundryPlugins)
+                {
+                    var modFound = false;
+                    foreach (var mod in allMods)
+                    {
+                        if (mod.modInfo.identifier == plugin.Key)
+                        {
+                            Debug.Log($"Unfoundry loading mod '{plugin.Key}'");
+                            plugin.Value.Load(mod);
+                            modFound = true;
+                            break;
+                        }
+                    }
+                    if (!modFound)
+                    {
+                        Debug.Log($"Unfoundry failed to find mod '{plugin.Key}'");
+                    }
+                }
             }
 
             [HarmonyPatch(typeof(BuildEntityEvent), nameof(BuildEntityEvent.processEvent))]
