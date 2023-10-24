@@ -22,14 +22,18 @@ namespace Unfoundry
         public const string
             MODNAME = "Unfoundry",
             AUTHOR = "erkle64",
-            GUID = "com." + AUTHOR + "." + MODNAME,
-            VERSION = "0.1.0";
+            GUID = AUTHOR + "." + MODNAME,
+            VERSION = "0.2.1";
 
         private static Dictionary<string, UnfoundryPlugin> _unfoundryPlugins = new Dictionary<string, UnfoundryPlugin>();
+        private static Config _config = null;
+        private static TypedConfigEntry<int> _configMaxQueuedEventsPerFrame = null;
 
         [OnGameAssemblyLoad]
         public static void FindUnfoundryMods(Assembly assembly)
         {
+            LoadConfig();
+
             foreach (System.Type type in assembly.GetTypes())
             {
                 var attributes = (UnfoundryModAttribute[])type.GetCustomAttributes(typeof(UnfoundryModAttribute), true);
@@ -43,6 +47,18 @@ namespace Unfoundry
                     }
                 }
             }
+        }
+
+        private static void LoadConfig()
+        {
+            if (_config != null) return;
+
+            _config = new Config(GUID)
+                .Group("Action Manager")
+                    .Entry(out _configMaxQueuedEventsPerFrame, "Max Queued Events Per Frame", 40)
+                .EndGroup()
+                .Load()
+                .Save();
         }
 
         public struct HandheldData
@@ -73,9 +89,9 @@ namespace Unfoundry
         {
             [HarmonyPatch(typeof(ObjectPoolManager), nameof(ObjectPoolManager.InitOnApplicationStart))]
             [HarmonyPrefix]
-            private static void LoadPlugin(BuildEntityEvent __instance)
+            private static void LoadPlugin()
             {
-                ActionManager.MaxQueuedEventsPerFrame = 20;
+                ActionManager.MaxQueuedEventsPerFrame = _configMaxQueuedEventsPerFrame?.Get() ?? 40;
 
                 var allMods = ModManager.getAllMods();
                 foreach (var plugin in _unfoundryPlugins)

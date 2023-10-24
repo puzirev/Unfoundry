@@ -140,7 +140,10 @@ namespace Unfoundry
             return this;
         }
 
-        internal static Dictionary<Type, Func<object, string>> _typedSavers = new Dictionary<Type, Func<object, string>>
+        public delegate string TypedSaver(object value);
+        public delegate object TypedLoader(string value, Type type);
+
+        private static Dictionary<Type, TypedSaver> _typedSavers = new Dictionary<Type, TypedSaver>
         {
             [typeof(bool)] = (value) => value.ToString().ToLowerInvariant(),
             [typeof(char)] = (value) => $"{(char)value}",
@@ -164,7 +167,7 @@ namespace Unfoundry
             [typeof(Vector3Int)] = (value) => value.ToString(),
             [typeof(Vector4Int)] = (value) => value.ToString(),
         };
-        internal static Dictionary<Type, Func<string, Type, object>> _typedLoaders = new Dictionary<Type, Func<string, Type, object>>
+        private static Dictionary<Type, TypedLoader> _typedLoaders = new Dictionary<Type, TypedLoader>
         {
             [typeof(bool)] = (value, type) => bool.Parse(value),
             [typeof(char)] = (value, type) => (value.Length > 0) ? value[0] : '\0',
@@ -188,6 +191,18 @@ namespace Unfoundry
             [typeof(Vector3Int)] = (value, type) => value.ToVector3Int(),
             [typeof(Vector4Int)] = (value, type) => value.ToVector4Int(),
         };
+
+        internal static bool TryGetSaver(Type type, out TypedSaver saver)
+        {
+            if (type.IsEnum) type = typeof(Enum);
+            return _typedSavers.TryGetValue(type, out saver);
+        }
+
+        internal static bool TryGetLoader(Type type, out TypedLoader loader)
+        {
+            if (type.IsEnum) type = typeof(Enum);
+            return _typedLoaders.TryGetValue(type, out loader);
+        }
     }
 
     public class ConfigGroup
@@ -289,17 +304,19 @@ namespace Unfoundry
         public T Get() => _value;
         public void Set(T value)
         {
+            if (EqualityComparer<T>.Default.Equals(_value, value)) return;
+
             var oldValue = value;
             _value = value;
             onChanged?.Invoke(oldValue, _value);
+            group?.config?.Save();
         }
 
         internal override void Load(string source)
         {
-            Debug.Log($"Unfoundry: Loading value '{source}' for '{fullName}'");
             try
             {
-                if (Config._typedLoaders.TryGetValue(typeof(T), out var loader))
+                if (Config.TryGetLoader(typeof(T), out var loader))
                 {
                     _value = (T)loader(source, typeof(T));
                 }
@@ -320,7 +337,7 @@ namespace Unfoundry
         {
             try
             {
-                if (Config._typedSavers.TryGetValue(typeof(T), out var saver))
+                if (Config.TryGetSaver(typeof(T), out var saver))
                 {
                     return saver(_value);
                 }

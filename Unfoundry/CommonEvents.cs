@@ -34,8 +34,8 @@ namespace Unfoundry
                 OnGameInitializationDone?.Invoke();
             }
 
-            [HarmonyPatch(typeof(GameCamera), nameof(GameCamera.Update))]
-            [HarmonyPrefix]
+            [HarmonyPatch(typeof(InputProxy), "Update")]
+            [HarmonyPostfix]
             private static void Update()
             {
                 OnUpdate?.Invoke();
@@ -43,11 +43,10 @@ namespace Unfoundry
             }
 
             [HarmonyPatch(typeof(GameRoot), "LateUpdate")]
-            [HarmonyPrefix]
+            [HarmonyPostfix]
             private static void LateUpdate()
             {
                 OnLateUpdate?.Invoke();
-                ActionManager.Update();
             }
 
             [HarmonyPatch(typeof(ResourceDB), nameof(ResourceDB.InitOnApplicationStart))]
