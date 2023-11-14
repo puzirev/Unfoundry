@@ -9,7 +9,7 @@ namespace Unfoundry
     {
         public static bool IsRadialMenuOpen { get; private set; } = false;
 
-        private static CustomRadialMenu radialMenu = null;
+        internal static CustomRadialMenu radialMenu = null;
 
         internal static Sprite spriteCenterBackground = null;
         internal static Material spriteCenterBackgroundMaterial = null;

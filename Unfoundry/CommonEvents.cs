@@ -30,6 +30,13 @@ namespace Unfoundry
             [HarmonyPostfix]
             private static void GameCamera_OnGameInitializationDone()
             {
+                if (CustomRadialMenuManager.radialMenu != null)
+                {
+                    OnLateUpdate -= CustomRadialMenuManager.radialMenu.Update;
+                    CustomRadialMenuManager.radialMenu = null;
+                    CustomRadialMenuManager.spriteCenterBackground = null;
+                    CustomRadialMenuManager.spriteSectorBackground = null;
+                }
                 ActionManager.OnGameInitializationDone();
                 OnGameInitializationDone?.Invoke();
             }

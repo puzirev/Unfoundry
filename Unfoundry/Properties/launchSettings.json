@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Profile 1": {
+      "commandName": "Executable",
+      "executablePath": "G:\\Games\\Foundry\\Foundry.exe",
+      "workingDirectory": "G:\\Games\\Foundry"
+    }
+  }
+}
