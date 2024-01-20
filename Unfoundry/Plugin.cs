@@ -2,7 +2,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Reflection;
-using Channel3.ModKit;
+using C3.ModKit;
+using C3;
 
 namespace Unfoundry
 {
@@ -17,7 +18,8 @@ namespace Unfoundry
         }
     }
 
-    public class Plugin
+    [NoStrip]
+    public class Plugin : AssemblyProcessor
     {
         public const string
             MODNAME = "Unfoundry",
@@ -29,8 +31,7 @@ namespace Unfoundry
         private static Config _config = null;
         private static TypedConfigEntry<int> _configMaxQueuedEventsPerFrame = null;
 
-        [OnGameAssemblyLoad]
-        public static void FindUnfoundryMods(Assembly assembly)
+        public override void ProcessAssembly(Assembly assembly, System.Type[] types)
         {
             LoadConfig();
 
@@ -93,7 +94,7 @@ namespace Unfoundry
             {
                 ActionManager.MaxQueuedEventsPerFrame = _configMaxQueuedEventsPerFrame?.Get() ?? 40;
 
-                var allMods = ModManager.getAllMods();
+                var allMods = typeof(ModManager).GetField("mods", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null) as List<Mod>;
                 foreach (var plugin in _unfoundryPlugins)
                 {
                     var modFound = false;

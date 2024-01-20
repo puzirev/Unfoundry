@@ -7,34 +7,37 @@
 
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\0Harmony.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Main">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\Main.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\Main.dll</HintPath>
+    </Reference>
+    <Reference Include="Channel3">
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\Channel3.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>G:\Games\Foundry\Foundry_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -43,7 +46,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y $(TargetPath) G:\Games\Foundry\Mods\A_Unfoundry" />
+    <Exec Command="copy /Y $(TargetPath) G:\Games\FoundryDemo2\Mods\A_Unfoundry" />
   </Target>
 
 </Project>
