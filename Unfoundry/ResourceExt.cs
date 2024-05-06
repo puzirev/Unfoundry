@@ -158,15 +158,15 @@ namespace Unfoundry
         public static Texture2D FindTexture(string name)
         {
             Texture2D result;
-            if (loadedTextures.TryGetValue(name, out result)) return result;
+            if (loadedTextures.TryGetValue(name, out result) && result != null) return result;
             Debug.Log(string.Format("Searching for texture '{0}'", name));
 
             if (allTextures1 == null) allTextures1 = Resources.FindObjectsOfTypeAll<Texture2D>();
             foreach (Texture2D texture in allTextures1)
             {
-                if (texture.name == name)
+                if (texture != null && texture.name == name)
                 {
-                    loadedTextures.Add(name, texture);
+                    loadedTextures[name] = texture;
                     return texture;
                 }
             }
@@ -174,9 +174,9 @@ namespace Unfoundry
             if (allTextures2 == null) allTextures2 = Resources.LoadAll<Texture2D>("");
             foreach (Texture2D texture in allTextures2)
             {
-                if (texture.name == name)
+                if (texture != null && texture.name == name)
                 {
-                    loadedTextures.Add(name, texture);
+                    loadedTextures[name] = texture;
                     return texture;
                 }
             }
@@ -184,11 +184,11 @@ namespace Unfoundry
             var icon = ResourceDB.getIcon(name);
             if(icon != null && icon.texture != null)
             {
-                loadedTextures.Add(name, icon.texture);
+                loadedTextures[name] = icon.texture;
                 return icon.texture;
             }
 
-            loadedTextures.Add(name, null);
+            loadedTextures[name] = null;
             Debug.LogError("Could not find texture: " + name);
             return null;
         }
