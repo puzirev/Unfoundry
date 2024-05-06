@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -7,9 +8,11 @@ using UnityEngine;
 
 namespace Unfoundry
 {
-    public class Config
+    public class Config : IEnumerable<ConfigGroup>
     {
         internal static Dictionary<string, Config> _configs = new Dictionary<string, Config>();
+
+        public static Dictionary<string, Config> allConfigs => _configs;
 
         private string _path;
 
@@ -203,9 +206,19 @@ namespace Unfoundry
             if (type.IsEnum) type = typeof(Enum);
             return _typedLoaders.TryGetValue(type, out loader);
         }
+
+        public IEnumerator<ConfigGroup> GetEnumerator()
+        {
+            return _groups.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _groups.Values.GetEnumerator();
+        }
     }
 
-    public class ConfigGroup
+    public class ConfigGroup : IEnumerable<ConfigEntry>
     {
         private Config _config;
         private string _name;
@@ -213,8 +226,8 @@ namespace Unfoundry
         private Dictionary<string, ConfigEntry> _entries = new Dictionary<string, ConfigEntry>();
 
         internal Config config => _config;
-        internal string name => _name;
-        internal string[] description => _description;
+        public string name => _name;
+        public string[] description => _description;
 
         internal ConfigGroup(Config config, string name, string[] description)
         {
@@ -237,7 +250,43 @@ namespace Unfoundry
                 throw new Exception($"Config entry '{name}' already exists in group '{_name}'.");
             }
 
-            entry = new TypedConfigEntry<T>(this, name, defaultValue, description);
+            entry = new TypedConfigEntry<T>(this, name, defaultValue, false, description);
+            _entries[name] = entry;
+            return this;
+        }
+
+        public ConfigGroup Entry<T>(out TypedConfigEntry<T> entry, string name, T defaultValue, Action<T, T> onChanged, params string[] description)
+        {
+            if (_entries.ContainsKey(name))
+            {
+                throw new Exception($"Config entry '{name}' already exists in group '{_name}'.");
+            }
+
+            entry = new TypedConfigEntry<T>(this, name, defaultValue, false, description, onChanged);
+            _entries[name] = entry;
+            return this;
+        }
+
+        public ConfigGroup Entry<T>(out TypedConfigEntry<T> entry, string name, T defaultValue, bool requiresRestart, params string[] description)
+        {
+            if (_entries.ContainsKey(name))
+            {
+                throw new Exception($"Config entry '{name}' already exists in group '{_name}'.");
+            }
+
+            entry = new TypedConfigEntry<T>(this, name, defaultValue, requiresRestart, description);
+            _entries[name] = entry;
+            return this;
+        }
+
+        public ConfigGroup Entry<T>(out TypedConfigEntry<T> entry, string name, T defaultValue, bool requiresRestart, Action<T, T> onChanged, params string[] description)
+        {
+            if (_entries.ContainsKey(name))
+            {
+                throw new Exception($"Config entry '{name}' already exists in group '{_name}'.");
+            }
+
+            entry = new TypedConfigEntry<T>(this, name, defaultValue, requiresRestart, description, onChanged);
             _entries[name] = entry;
             return this;
         }
@@ -257,23 +306,39 @@ namespace Unfoundry
                 writer.WriteLine($"{entry.Key} = {entry.Value.Save()}");
             }
         }
+
+        public IEnumerator<ConfigEntry> GetEnumerator()
+        {
+            return _entries.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _entries.Values.GetEnumerator();
+        }
     }
 
     public abstract class ConfigEntry
     {
         private ConfigGroup _group;
         private string _name;
+        private bool _requiresRestart;
         private string[] _description;
 
         internal ConfigGroup group => _group;
-        internal string name => _name;
-        internal string fullName => $"{_group?.name ?? ""}.{_name}";
-        internal string[] description => _description;
+        public string name => _name;
+        public string fullName => $"{_group?.name ?? ""}.{_name}";
+        public bool requiresRestart => _requiresRestart;
+        public string[] description => _description;
 
-        internal ConfigEntry(ConfigGroup group, string name, string[] description)
+        public abstract Type selfType { get; }
+        public abstract Type valueType { get; }
+
+        internal ConfigEntry(ConfigGroup group, string name, bool requiresRestart, string[] description)
         {
             _group = group;
             _name = name;
+            _requiresRestart = requiresRestart;
             _description = description;
         }
 
@@ -296,9 +361,20 @@ namespace Unfoundry
 
         internal T value => _value;
 
-        internal TypedConfigEntry(ConfigGroup group, string name, T defaultValue, string[] description) : base(group, name, description)
+        public override Type selfType => typeof(TypedConfigEntry<T>);
+        public override Type valueType => typeof(T);
+
+        internal TypedConfigEntry(ConfigGroup group, string name, T defaultValue, bool requiresRestart, string[] description)
+            : base(group, name, requiresRestart, description)
         {
             _defaultValue = _value = defaultValue;
+        }
+
+        public TypedConfigEntry(ConfigGroup group, string name, T defaultValue, bool requiresRestart, string[] description, Action<T, T> onChanged)
+            : base(group, name, requiresRestart, description)
+        {
+            _defaultValue = _value = defaultValue;
+            this.onChanged = onChanged;
         }
 
         public T Get() => _value;
@@ -352,6 +428,11 @@ namespace Unfoundry
             }
 
             return string.Empty;
+        }
+
+        public override string ToString()
+        {
+            return _value.ToString();
         }
     }
 }

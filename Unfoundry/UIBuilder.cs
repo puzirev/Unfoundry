@@ -49,6 +49,18 @@ namespace Unfoundry
             return this;
         }
 
+        public UIBuilder With(Action<GameObject> action)
+        {
+            action(GameObject);
+            return this;
+        }
+
+        public UIBuilder WithComponent<T>(Action<T> action)
+        {
+            action(GameObject.GetComponent<T>());
+            return this;
+        }
+
         public UIBuilder Keep<C>(out C component) where C : Component
         {
             component = GameObject.GetComponent<C>();
@@ -287,6 +299,35 @@ namespace Unfoundry
                     .Done
                 .Done
                 .Component_Slider(value, rangeFrom, rangeTo, fillRect, handleRect, onValueChanged);
+        }
+
+        public UIBuilder Element_InputField(string name, string text, TMP_InputField.ContentType contentType = TMP_InputField.ContentType.Standard)
+        {
+            return Element(name)
+                .Component_Image("corner_cut", Color.white, Image.Type.Sliced, new Vector4(10.0f, 1.0f, 2.0f, 10.0f))
+                .Component<TMP_InputField>()
+                .Layout()
+                    .MinWidth(40)
+                    .MinHeight(40)
+                    .FlexibleWidth(1.0f)
+                .Done
+                .Element("TextArea")
+                    .SetRectTransform(10, 6, -10, -6, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f)
+                    .Component<RectMask2D>()
+                    .Element("Text")
+                        .SetRectTransform(0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f)
+                        .Component_Text(text, "OpenSansSemibold SDF", 18.0f, Color.black, TextAlignmentOptions.MidlineLeft)
+                    .Done
+                .Done
+                .WithComponent((TMP_InputField inputField) =>
+                {
+                    inputField.textComponent = inputField.gameObject.GetComponentInChildren<TextMeshProUGUI>();
+                    inputField.text = text;
+                    inputField.selectionColor = new Color(0.6f, 0.6f, 1.0f, 1.0f);
+                    inputField.enabled = false; // Hack to make caret appear
+                    inputField.enabled = true;
+                    inputField.contentType = contentType;
+                });
         }
 
         public UIBuilder SetTransitionColors(Color normalColor, Color highlightedColor, Color pressedColor, Color selectedColor, Color disabledColor, float colorMultiplier, float fadeDuration)

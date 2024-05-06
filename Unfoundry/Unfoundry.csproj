@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y $(TargetPath) G:\Games\FoundryDemo2\Mods\A_Unfoundry" />
+    <Exec Command="copy /Y $(TargetPath) G:\SteamLibrary\steamapps\common\FOUNDRY\Mods\A_Unfoundry" />
   </Target>
 
 </Project>
