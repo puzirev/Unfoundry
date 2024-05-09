@@ -25,7 +25,7 @@ namespace Unfoundry
             MODNAME = "Unfoundry",
             AUTHOR = "erkle64",
             GUID = AUTHOR + "." + MODNAME,
-            VERSION = "0.3.2";
+            VERSION = "0.3.3";
 
         private static Dictionary<string, UnfoundryPlugin> _unfoundryPlugins = new Dictionary<string, UnfoundryPlugin>();
         private static Config _config = null;
@@ -119,7 +119,9 @@ namespace Unfoundry
             [HarmonyPrefix]
             private static void BuildEntityEvent_processEvent_prefix(BuildEntityEvent __instance)
             {
-                if (__instance.characterHash != GameRoot.getClientCharacter().usernameHash) return;
+                if (__instance == null) return;
+                if (!(GameRoot.getClientCharacter() is Character character)) return;
+                if (__instance.characterHash != character.usernameHash) return;
                 lastSpawnedBuildableWrapperEntityId = 0;
             }
 
@@ -127,7 +129,9 @@ namespace Unfoundry
             [HarmonyPostfix]
             private static void BuildEntityEvent_processEvent_postfix(BuildEntityEvent __instance)
             {
-                if (__instance.characterHash != GameRoot.getClientCharacter().usernameHash) return;
+                if (__instance == null) return;
+                if (!(GameRoot.getClientCharacter() is Character character)) return;
+                if (__instance.characterHash != character.usernameHash) return;
                 ActionManager.InvokeAndRemoveBuildEvent(__instance, lastSpawnedBuildableWrapperEntityId);
             }
 
