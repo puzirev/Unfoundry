@@ -21,7 +21,7 @@ namespace Unfoundry
             ConfirmationFrame.onCancel = onCancel;
 
             Vector2 panelSize = confirmDestroyFrame.GetComponent<RectTransform>().sizeDelta;
-            var targetPos = CursorManager.singleton.mousePosition;
+            var targetPos = CursorManager.mousePosition;
             targetPos.x = Mathf.Clamp(targetPos.x, panelSize.x * 0.6f, Screen.width - panelSize.x * 0.6f);
             targetPos.y = Mathf.Clamp(targetPos.y, panelSize.y * 0.6f, Screen.height - panelSize.y * 0.6f);
 

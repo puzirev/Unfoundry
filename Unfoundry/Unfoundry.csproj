@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="$(SolutionDir)Foundry.props" Condition="Exists('$(SolutionDir)Foundry.props')" />
+
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -7,37 +9,37 @@
 
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\0Harmony.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Main">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\Main.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)Main.dll</HintPath>
     </Reference>
     <Reference Include="Channel3">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\Channel3.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)Channel3.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>G:\Games\FoundryDemo2\Foundry_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>$(FoundryAssembliesPath)UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -46,7 +48,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y $(TargetPath) G:\SteamLibrary\steamapps\common\FOUNDRY\Mods\A_Unfoundry" />
+    <Exec Command="copy /Y $(TargetPath) $(TargetModPath)" />
   </Target>
 
 </Project>
