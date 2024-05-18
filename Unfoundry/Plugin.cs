@@ -25,11 +25,13 @@ namespace Unfoundry
             MODNAME = "Unfoundry",
             AUTHOR = "erkle64",
             GUID = AUTHOR + "." + MODNAME,
-            VERSION = "0.3.4";
+            VERSION = "0.3.5";
 
-        private static Dictionary<string, UnfoundryPlugin> _unfoundryPlugins = new Dictionary<string, UnfoundryPlugin>();
+        private static readonly Dictionary<string, UnfoundryPlugin> _unfoundryPlugins = new Dictionary<string, UnfoundryPlugin>();
         private static Config _config = null;
         private static TypedConfigEntry<int> _configMaxQueuedEventsPerFrame = null;
+
+        internal static Dictionary<string, UnityEngine.Object> bundleMainAssets;
 
         public override void ProcessAssembly(Assembly assembly, System.Type[] types)
         {
@@ -71,7 +73,7 @@ namespace Unfoundry
                 CurrentlySetMode = currentlySetMode;
             }
         }
-        private static Dictionary<ulong, HandheldData> handheldData = new Dictionary<ulong, HandheldData>();
+        private static readonly Dictionary<ulong, HandheldData> handheldData = new Dictionary<ulong, HandheldData>();
 
         private static ulong lastSpawnedBuildableWrapperEntityId = 0;
         
@@ -85,6 +87,17 @@ namespace Unfoundry
             return (double)num2 > (double)num1 && (double)num2 > (double)num3 ? new Vector3(0.0f, Mathf.Sign(direction.y), 0.0f) : new Vector3(0.0f, 0.0f, Mathf.Sign(direction.z));
         }
 
+        public static T GetAsset<T>(string name) where T : UnityEngine.Object
+        {
+            if (!bundleMainAssets.TryGetValue(name, out var asset))
+            {
+                Debug.Log($"Missing asset '{name}'");
+                return null;
+            }
+
+            return (T)asset;
+        }
+
         [HarmonyPatch]
         public static class Patch
         {
@@ -94,7 +107,24 @@ namespace Unfoundry
             {
                 ActionManager.MaxQueuedEventsPerFrame = _configMaxQueuedEventsPerFrame?.Get() ?? 40;
 
+
                 var allMods = typeof(ModManager).GetField("mods", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null) as List<Mod>;
+                bool assetsFound = false;
+                foreach (var mod in allMods)
+                {
+                    if (mod.modInfo.identifier == "erkle64.unfoundry")
+                    {
+                        Debug.Log("Unfoundry loading common assets.");
+                        bundleMainAssets = typeof(Mod).GetField("assets", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(mod) as Dictionary<string, UnityEngine.Object>;
+                        assetsFound = true;
+                        break;
+                    }
+                }
+                if (!assetsFound)
+                {
+                    Debug.Log("Unfoundry failed to load common assets.");
+                }
+
                 foreach (var plugin in _unfoundryPlugins)
                 {
                     var modFound = false;
@@ -137,7 +167,7 @@ namespace Unfoundry
 
             [HarmonyPatch(typeof(BuildingManager), nameof(BuildingManager.buildingManager_constructBuildableWrapper))]
             [HarmonyPostfix]
-            private static void BuildingManager_buildingManager_constructBuildableWrapper(v3i pos, ulong buildableObjectTemplateId, ulong __result)
+            private static void BuildingManager_buildingManager_constructBuildableWrapper(ulong __result)
             {
                 lastSpawnedBuildableWrapperEntityId = __result;
             }
@@ -164,9 +194,7 @@ namespace Unfoundry
                 {
                     __instance.terrainRemovalPlaceholderId = 0ul;
 
-                    ulong chunkIndex;
-                    uint blockIndex;
-                    ChunkManager.getChunkIdxAndTerrainArrayIdxFromWorldCoords(__instance.worldPos.x, __instance.worldPos.y, __instance.worldPos.z, out chunkIndex, out blockIndex);
+                    ChunkManager.getChunkIdxAndTerrainArrayIdxFromWorldCoords(__instance.worldPos.x, __instance.worldPos.y, __instance.worldPos.z, out ulong chunkIndex, out uint blockIndex);
 
                     byte terrainType = 0;
                     ChunkManager.chunks_removeTerrainBlock(chunkIndex, blockIndex, ref terrainType);

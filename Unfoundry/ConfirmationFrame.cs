@@ -21,7 +21,30 @@ namespace Unfoundry
             ConfirmationFrame.onCancel = onCancel;
 
             Vector2 panelSize = confirmDestroyFrame.GetComponent<RectTransform>().sizeDelta;
-            var targetPos = CursorManager.mousePosition;
+            var targetPos = CursorManager.singleton.mousePosition;
+            targetPos.x = Mathf.Clamp(targetPos.x, panelSize.x * 0.6f, Screen.width - panelSize.x * 0.6f);
+            targetPos.y = Mathf.Clamp(targetPos.y, panelSize.y * 0.6f, Screen.height - panelSize.y * 0.6f);
+
+            confirmDestroyFrame.transform.position = targetPos;
+        }
+
+        public static void Show(string text, string confirmButtonText, ConfirmDestroyDelegate onConfirm, ConfirmDestroyDelegate onCancel = null)
+        {
+            if (confirmDestroyFrame != null) Object.Destroy(confirmDestroyFrame);
+
+            confirmDestroyFrame = Object.Instantiate(ResourceDB.ui_destroyItemConfirmation, GlobalStateManager.getDefaultUICanvasTransform(true), false).GetComponent<DestroyItemConfirmationFrame>();
+            confirmDestroyFrame.uiText_message.setText(text);
+            Traverse.Create(confirmDestroyFrame).Field("itemTemplateToDestroyId").SetValue((ulong)0);
+            ConfirmationFrame.onConfirm = onConfirm;
+            ConfirmationFrame.onCancel = onCancel;
+
+            foreach (var button in confirmDestroyFrame.GetComponentsInChildren<UIButton>())
+            {
+                if (button.tmp_text.text == "Destroy") button.tmp_text.text = confirmButtonText;
+            }
+
+            Vector2 panelSize = confirmDestroyFrame.GetComponent<RectTransform>().sizeDelta;
+            var targetPos = CursorManager.singleton.mousePosition;
             targetPos.x = Mathf.Clamp(targetPos.x, panelSize.x * 0.6f, Screen.width - panelSize.x * 0.6f);
             targetPos.y = Mathf.Clamp(targetPos.y, panelSize.y * 0.6f, Screen.height - panelSize.y * 0.6f);
 

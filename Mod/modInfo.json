@@ -1,0 +1,10 @@
+{
+  "identifier": "erkle64.unfoundry",
+  "displayName": "Unfoundry",
+  "assetBundles": [
+    "unfoundry.bundle"
+  ],
+  "assemblies": [
+    "Unfoundry.dll"
+  ]
+}

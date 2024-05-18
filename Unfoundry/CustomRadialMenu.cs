@@ -68,12 +68,12 @@ namespace Unfoundry
     {
         public const int MaxSectors = 16;
 
-        private Canvas canvas;
-        private GameObject gameObject;
-        private GameObject sectorContainer;
-        private TMP_Text centerText;
+        private readonly Canvas canvas;
+        private readonly GameObject gameObject;
+        private readonly GameObject sectorContainer;
+        private readonly TMP_Text centerText;
 
-        private CustomRadialMenuSector[] sectors = new CustomRadialMenuSector[MaxSectors];
+        private readonly CustomRadialMenuSector[] sectors = new CustomRadialMenuSector[MaxSectors];
         public int VisibleSectorCount { get; private set; } = 0;
 
 
@@ -107,7 +107,7 @@ namespace Unfoundry
         private bool hiding = false;
         private float lastHideTime = float.NaN;
 
-        private int deadzone;
+        private readonly int deadzone;
 
         public CustomRadialMenu(Canvas canvas)
         {
@@ -228,7 +228,7 @@ namespace Unfoundry
 
             int width = Screen.width;
             int height = Screen.height;
-            var mousePosition = CursorManager.mousePosition;
+            var mousePosition = CursorManager.singleton.mousePosition;
 
             int mouseHighlightedSectorIndex = -1;
             var mouseOffset = new Vector2(mousePosition.x - width * 0.5f, mousePosition.y - height * 0.5f) / canvas.scaleFactor;
@@ -248,15 +248,15 @@ namespace Unfoundry
     {
         public string Description { get; private set; } = "";
 
-        private GameObject gameObject;
-        private RectTransform iconRectTransform;
-        private Image backgroundImage;
-        private Image iconImage;
-        private TMP_Text subscriptText;
+        private readonly GameObject gameObject;
+        private readonly RectTransform iconRectTransform;
+        private readonly Image backgroundImage;
+        private readonly Image iconImage;
+        private readonly TMP_Text subscriptText;
 
         public CustomRadialMenuOption.ActivatedDelegate OnActivated { get; private set; }
 
-        private int iconCenterOffset;
+        private readonly int iconCenterOffset;
 
         private bool isHighlighted = false;
         public bool IsHighlighted
@@ -341,7 +341,7 @@ namespace Unfoundry
         public ActivatedDelegate OnActivated { get; private set; }
         public IsEnabledDelegate IsEnabledHandler { get; private set; }
 
-        public bool IsEnabled => IsEnabledHandler == null ? true : IsEnabledHandler.Invoke();
+        public bool IsEnabled => IsEnabledHandler == null || IsEnabledHandler.Invoke();
 
         public CustomRadialMenuOption(string description, Sprite icon, ActivatedDelegate onActivated, IsEnabledDelegate isEnabledHandler = null)
             : this(description, icon, "", onActivated, isEnabledHandler)

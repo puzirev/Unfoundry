@@ -41,14 +41,10 @@ namespace Unfoundry
 
         public static void ExitCurrentMode(ItemTemplate itemTemplate)
         {
-            Debug.Log($"Deselecting custom handheld to select {itemTemplate.identifier}");
-
             ExitCurrentMode(GameRoot.getClientCharacter());
         }
         public static void ExitCurrentMode2()
         {
-            Debug.Log($"Deselecting custom handheld");
-
             ExitCurrentMode(GameRoot.getClientCharacter());
         }
         public static void ExitCurrentMode() => ExitCurrentMode(GameRoot.getClientCharacter());
@@ -229,8 +225,6 @@ namespace Unfoundry
                 Character.SaveSync_EquipmentMode syncEquipmentMode = new Character.SaveSync_EquipmentMode(character.usernameHash, modeToSet);
 
                 GameRoot.addLockstepEvent(syncEquipmentMode);
-
-                Debug.Log($"Set equipment mode to {modeToSet}");
 
                 return false;
             }

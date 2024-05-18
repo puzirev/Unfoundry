@@ -21,9 +21,11 @@ namespace Unfoundry
 
         public static UIBuilder BeginWith(GameObject gameObject)
         {
-            UIBuilder builder = new UIBuilder();
-            builder.GameObject = gameObject;
-            builder.Parent = null;
+            UIBuilder builder = new UIBuilder
+            {
+                GameObject = gameObject,
+                Parent = null
+            };
 
             return builder;
         }
@@ -167,9 +169,11 @@ namespace Unfoundry
             var gameObject = new GameObject(name, typeof(RectTransform));
             if (GameObject != null) gameObject.transform.SetParent(GameObject.transform, false);
 
-            UIBuilder elementBuilder = new UIBuilder();
-            elementBuilder.GameObject = gameObject;
-            elementBuilder.Parent = this;
+            UIBuilder elementBuilder = new UIBuilder
+            {
+                GameObject = gameObject,
+                Parent = this
+            };
 
             return elementBuilder;
         }
@@ -274,7 +278,6 @@ namespace Unfoundry
 
         public UIBuilder Element_Slider(string name, float value, float rangeFrom, float rangeTo, OnValueChangedDelegate onValueChanged = null)
         {
-            RectTransform fillRect, handleRect;
             return Element(name)
                 .Element("Background")
                     .SetRectTransform(10.0f, -10.0f, -10.0f, 10.0f, 0.5f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f)
@@ -284,7 +287,7 @@ namespace Unfoundry
                 .Element("Fill Area")
                     .SetRectTransform(10.0f, 0.0f, -10.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.25f, 1.0f, 0.75f)
                     .Element("Fill")
-                        .Keep(out fillRect)
+                        .Keep(out RectTransform fillRect)
                         .SetRectTransform(-5.0f, 0.0f, 5.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f, 0.1919192f, 1.0f)
                         .Component_Image("solid_square_white", new Color(0.0f, 0.6f, 1.0f))
                     .Done
@@ -292,7 +295,7 @@ namespace Unfoundry
                 .Element("Handle Slide Area")
                     .SetRectTransform(10.0f, 0.0f, -10.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f)
                     .Element("Handle")
-                        .Keep(out handleRect)
+                        .Keep(out RectTransform handleRect)
                         .SetRectTransform(-12.5f, 0.0f, 12.5f, 0.0f, 0.5f, 0.5f, 0.1919192f, 0.0f, 0.1919192f, 1.0f)
                         .Component_Image("solid_square_white", new Color(0.0f, 0.6f, 1.0f))
                         .Component<Outline>()
@@ -330,19 +333,47 @@ namespace Unfoundry
                 });
         }
 
+        private static GameObject _scrollBoxPrefab = null;
+        public UIBuilder Element_ScrollBox(string name, Action<UIBuilder> contentBuilder)
+        {
+            if (_scrollBoxPrefab == null)
+            {
+                _scrollBoxPrefab = Plugin.GetAsset<GameObject>("ScrollBox");
+                if (_scrollBoxPrefab == null) throw new Exception("Failed to load ScrollBox prefab");
+            }
+
+            var gameObject = UnityEngine.Object.Instantiate(_scrollBoxPrefab);
+            if (GameObject != null) gameObject.transform.SetParent(GameObject.transform, false);
+            var content = gameObject.transform.Find("Viewport/Content");
+
+            contentBuilder(new UIBuilder
+            {
+                GameObject = content.gameObject,
+                Parent = this
+            });
+
+            return new UIBuilder
+            {
+                GameObject = gameObject,
+                Parent = this
+            };
+        }
+
         public UIBuilder SetTransitionColors(Color normalColor, Color highlightedColor, Color pressedColor, Color selectedColor, Color disabledColor, float colorMultiplier, float fadeDuration)
         {
             var selectable = GameObject.GetComponent<Selectable>();
             if (selectable != null)
             {
-                var colors = new ColorBlock();
-                colors.normalColor = normalColor;
-                colors.highlightedColor = highlightedColor;
-                colors.pressedColor = pressedColor;
-                colors.selectedColor = selectedColor;
-                colors.disabledColor = disabledColor;
-                colors.colorMultiplier = colorMultiplier;
-                colors.fadeDuration = fadeDuration;
+                var colors = new ColorBlock
+                {
+                    normalColor = normalColor,
+                    highlightedColor = highlightedColor,
+                    pressedColor = pressedColor,
+                    selectedColor = selectedColor,
+                    disabledColor = disabledColor,
+                    colorMultiplier = colorMultiplier,
+                    fadeDuration = fadeDuration
+                };
 
                 selectable.transition = Selectable.Transition.ColorTint;
                 selectable.colors = colors;
@@ -354,7 +385,7 @@ namespace Unfoundry
         public UIBuilder SetOnClick(OnClickDelegate action)
         {
             var button = GameObject.GetComponent<Button>();
-            if (button != null) button.onClick.AddListener(new UnityAction(action));
+            button?.onClick.AddListener(new UnityAction(action));
 
             return this;
         }
@@ -472,11 +503,10 @@ namespace Unfoundry
             return new LayoutElementBuilder(this);
         }
 
-        private static Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
+        private static readonly Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
         private static Sprite GetSprite(string textureName, Vector4 border)
         {
-            Sprite sprite;
-            if (sprites.TryGetValue(textureName, out sprite)) return sprite;
+            if (sprites.TryGetValue(textureName, out Sprite sprite)) return sprite;
 
             var texture = ResourceExt.FindTexture(textureName);
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f, 0, SpriteMeshType.FullRect, border);
@@ -484,7 +514,7 @@ namespace Unfoundry
 
         public class LayoutElementBuilder
         {
-            private LayoutElement component;
+            private readonly LayoutElement component;
 
             internal LayoutElementBuilder(UIBuilder parent)
             {
