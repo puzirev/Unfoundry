@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using C3.ModKit;
 using C3;
+using System.Drawing;
 
 namespace Unfoundry
 {
@@ -32,6 +33,24 @@ namespace Unfoundry
         private static TypedConfigEntry<int> _configMaxQueuedEventsPerFrame = null;
 
         internal static Dictionary<string, UnityEngine.Object> bundleMainAssets;
+
+        private static string[] _texturesToRegister = new string[]
+        {
+            "assembler_iii",
+            "biomass",
+            "corner_cut",
+            "corner_cut_fully_inset",
+            "corner_cut_outline",
+            "cross",
+            "dirt",
+            "download",
+            "floor",
+            "icons8-chevron-left-filled-100_white",
+            "icons8-error-100",
+            "icons8-info-512",
+            "solid_square_white",
+            "upload"
+        };
 
         public override void ProcessAssembly(Assembly assembly, System.Type[] types)
         {
@@ -117,6 +136,14 @@ namespace Unfoundry
                         Debug.Log("Unfoundry loading common assets.");
                         bundleMainAssets = typeof(Mod).GetField("assets", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(mod) as Dictionary<string, UnityEngine.Object>;
                         assetsFound = true;
+
+                        foreach (var textureName in _texturesToRegister)
+                        {
+                            var texture = bundleMainAssets.LoadAsset<Texture2D>(textureName);
+                            if (texture == null) continue;
+                            ResourceExt.RegisterTexture(textureName, texture);
+                        }
+
                         break;
                     }
                 }
