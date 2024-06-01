@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using C3.ModKit;
 using C3;
-using System.Drawing;
 
 namespace Unfoundry
 {
@@ -26,7 +25,7 @@ namespace Unfoundry
             MODNAME = "Unfoundry",
             AUTHOR = "erkle64",
             GUID = AUTHOR + "." + MODNAME,
-            VERSION = "0.3.5";
+            VERSION = "0.3.7";
 
         private static readonly Dictionary<string, UnfoundryPlugin> _unfoundryPlugins = new Dictionary<string, UnfoundryPlugin>();
         private static Config _config = null;

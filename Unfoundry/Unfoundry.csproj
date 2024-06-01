@@ -41,6 +41,9 @@
     <Reference Include="UnityEngine.UIModule">
       <HintPath>$(FoundryAssembliesPath)UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>$(FoundryAssembliesPath)UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

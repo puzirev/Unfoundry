@@ -20,12 +20,7 @@ namespace Unfoundry
             ConfirmationFrame.onConfirm = onConfirm;
             ConfirmationFrame.onCancel = onCancel;
 
-            Vector2 panelSize = confirmDestroyFrame.GetComponent<RectTransform>().sizeDelta;
-            var targetPos = CursorManager.singleton.mousePosition;
-            targetPos.x = Mathf.Clamp(targetPos.x, panelSize.x * 0.6f, Screen.width - panelSize.x * 0.6f);
-            targetPos.y = Mathf.Clamp(targetPos.y, panelSize.y * 0.6f, Screen.height - panelSize.y * 0.6f);
-
-            confirmDestroyFrame.transform.position = targetPos;
+            AudioManager.playUISoundEffect(ResourceDB.resourceLinker.audioClip_UIOpen);
         }
 
         public static void Show(string text, string confirmButtonText, ConfirmDestroyDelegate onConfirm, ConfirmDestroyDelegate onCancel = null)
@@ -44,7 +39,7 @@ namespace Unfoundry
             }
 
             Vector2 panelSize = confirmDestroyFrame.GetComponent<RectTransform>().sizeDelta;
-            var targetPos = CursorManager.singleton.mousePosition;
+            var targetPos = CursorManager.mousePosition;
             targetPos.x = Mathf.Clamp(targetPos.x, panelSize.x * 0.6f, Screen.width - panelSize.x * 0.6f);
             targetPos.y = Mathf.Clamp(targetPos.y, panelSize.y * 0.6f, Screen.height - panelSize.y * 0.6f);
 
@@ -66,12 +61,14 @@ namespace Unfoundry
             [HarmonyPrefix]
             private static bool DestroyItemConfirmationFrame_destroyOnClick(DestroyItemConfirmationFrame __instance)
             {
-                if (Traverse.Create(__instance).Field("itemTemplateToDestroyId").GetValue<ulong>() != 0 || onConfirm == null) return true;
+                if (Traverse.Create(__instance).Field("itemTemplateToDestroyId").GetValue<ulong>() != 0) return true;
 
-                onConfirm.Invoke();
+                onConfirm?.Invoke();
                 onConfirm = onCancel = null;
 
                 Object.Destroy(__instance.gameObject);
+
+                AudioManager.playUISoundEffect(ResourceDB.resourceLinker.audioClip_UIClose);
 
                 return false;
             }
@@ -80,12 +77,14 @@ namespace Unfoundry
             [HarmonyPrefix]
             private static bool DestroyItemConfirmationFrame_cancelOnClick(DestroyItemConfirmationFrame __instance)
             {
-                if (Traverse.Create(__instance).Field("itemTemplateToDestroyId").GetValue<ulong>() != 0 || onCancel == null) return true;
+                if (Traverse.Create(__instance).Field("itemTemplateToDestroyId").GetValue<ulong>() != 0) return true;
 
-                onCancel.Invoke();
+                onCancel?.Invoke();
                 onConfirm = onCancel = null;
 
                 Object.Destroy(__instance.gameObject);
+
+                AudioManager.playUISoundEffect(ResourceDB.resourceLinker.audioClip_UIClose);
 
                 return false;
             }

@@ -47,12 +47,7 @@ namespace Unfoundry
 
             textEntryFrame.uiText_buttonText.text = confirmButtonText;
 
-            Vector2 panelSize = textEntryFrame.GetComponent<RectTransform>().sizeDelta;
-            var targetPos = CursorManager.mousePosition;
-            targetPos.x = Mathf.Clamp(targetPos.x, panelSize.x * 0.6f, Screen.width - panelSize.x * 0.6f);
-            targetPos.y = Mathf.Clamp(targetPos.y, panelSize.y * 0.6f, Screen.height - panelSize.y * 0.6f);
-
-            textEntryFrame.transform.position = targetPos;
+            AudioManager.playUISoundEffect(ResourceDB.resourceLinker.audioClip_UIOpen);
         }
 
 
@@ -96,6 +91,8 @@ namespace Unfoundry
                 onConfirm = null;
                 onCancel = null;
 
+                AudioManager.playUISoundEffect(ResourceDB.resourceLinker.audioClip_UIClose);
+
                 return false;
             }
 
@@ -110,6 +107,8 @@ namespace Unfoundry
                 onCancel?.Invoke();
                 onConfirm = null;
                 onCancel = null;
+
+                AudioManager.playUISoundEffect(ResourceDB.resourceLinker.audioClip_UIClose);
 
                 return false;
             }

@@ -228,7 +228,7 @@ namespace Unfoundry
 
             int width = Screen.width;
             int height = Screen.height;
-            var mousePosition = CursorManager.singleton.mousePosition;
+            var mousePosition = CursorManager.mousePosition;
 
             int mouseHighlightedSectorIndex = -1;
             var mouseOffset = new Vector2(mousePosition.x - width * 0.5f, mousePosition.y - height * 0.5f) / canvas.scaleFactor;
