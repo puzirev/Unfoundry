@@ -38,12 +38,7 @@ namespace Unfoundry
                 if (button.tmp_text.text == "Destroy") button.tmp_text.text = confirmButtonText;
             }
 
-            Vector2 panelSize = confirmDestroyFrame.GetComponent<RectTransform>().sizeDelta;
-            var targetPos = CursorManager.mousePosition;
-            targetPos.x = Mathf.Clamp(targetPos.x, panelSize.x * 0.6f, Screen.width - panelSize.x * 0.6f);
-            targetPos.y = Mathf.Clamp(targetPos.y, panelSize.y * 0.6f, Screen.height - panelSize.y * 0.6f);
-
-            confirmDestroyFrame.transform.position = targetPos;
+            AudioManager.playUISoundEffect(ResourceDB.resourceLinker.audioClip_UIOpen);
         }
 
 
