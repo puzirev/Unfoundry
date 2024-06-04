@@ -519,7 +519,10 @@ namespace Unfoundry
             internal LayoutElementBuilder(UIBuilder parent)
             {
                 Parent = parent;
-                component = Parent.GameObject.AddComponent<LayoutElement>();
+                if (!Parent.GameObject.TryGetComponent(out component))
+                {
+                    component = Parent.GameObject.AddComponent<LayoutElement>();
+                }
             }
 
             public LayoutElementBuilder MinWidth(float value) { component.minWidth = value; return this; }
