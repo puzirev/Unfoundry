@@ -25,7 +25,7 @@ namespace Unfoundry
             MODNAME = "Unfoundry",
             AUTHOR = "erkle64",
             GUID = AUTHOR + "." + MODNAME,
-            VERSION = "0.3.9";
+            VERSION = "0.3.10";
 
         private static readonly Dictionary<string, UnfoundryPlugin> _unfoundryPlugins = new Dictionary<string, UnfoundryPlugin>();
         private static Config _config = null;
@@ -48,7 +48,10 @@ namespace Unfoundry
             "icons8-error-100",
             "icons8-info-512",
             "solid_square_white",
-            "upload"
+            "upload",
+            "checkmark_208x208",
+            "icon_plus",
+            "icon_minus"
         };
 
         public override void ProcessAssembly(Assembly assembly, System.Type[] types)

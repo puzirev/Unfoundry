@@ -192,7 +192,7 @@ namespace Unfoundry
 
         public void Update()
         {
-            if (!gameObject.activeSelf) return;
+            if (gameObject == null || !gameObject.activeSelf) return;
 
             if (showing)
             {
