@@ -72,6 +72,7 @@ namespace Unfoundry
         private readonly GameObject gameObject;
         private readonly GameObject sectorContainer;
         private readonly TMP_Text centerText;
+        private readonly TMP_Text centerSubscriptText;
 
         private readonly CustomRadialMenuSector[] sectors = new CustomRadialMenuSector[MaxSectors];
         public int VisibleSectorCount { get; private set; } = 0;
@@ -94,10 +95,12 @@ namespace Unfoundry
                     var sector = sectors[highlightedSectorIndex];
                     sector.IsHighlighted = true;
                     centerText.text = sector.Description;
+                    centerSubscriptText.text = sector.Subscript;
                 }
                 else
                 {
-                    centerText.text = "";
+                    centerText.text = string.Empty;
+                    centerSubscriptText.text = string.Empty;
                 }
             }
         }
@@ -129,6 +132,11 @@ namespace Unfoundry
                         .SetRectTransform(9, 0, -9, 0, 0.5f, 0.5f, 0.25f, 0.25f, 0.75f, 0.75f)
                         .Component_Text("", "OpenSansSemibold SDF", 30, Color.white, TextAlignmentOptions.Center)
                         .Keep(out centerText)
+                    .Done
+                    .Element("Center Text")
+                        .SetRectTransform(9, 0, -9, 0, 0.5f, 0.5f, 0.32f, 0.32f, 0.68f, 0.68f)
+                        .Component_Text("", "OpenSansSemibold SDF", 16, Color.white, TextAlignmentOptions.Bottom)
+                        .Keep(out centerSubscriptText)
                     .Done
                     .GameObject;
 
@@ -247,12 +255,12 @@ namespace Unfoundry
     public class CustomRadialMenuSector
     {
         public string Description { get; private set; } = "";
+        public string Subscript { get; private set; } = "";
 
         private readonly GameObject gameObject;
         private readonly RectTransform iconRectTransform;
         private readonly Image backgroundImage;
         private readonly Image iconImage;
-        private readonly TMP_Text subscriptText;
 
         public CustomRadialMenuOption.ActivatedDelegate OnActivated { get; private set; }
 
@@ -287,11 +295,6 @@ namespace Unfoundry
                         .Component_Image((Sprite)null)
                         .Keep(out iconImage)
                         .Keep(out iconRectTransform)
-                        .Element("Subscript")
-                            .SetRectTransform(0, 2.5f, -5f, 0, 0.5f, 0.5f, 0, 0, 1, 1)
-                            .Component_Text("", "OpenSansSemibold SDF", 18, Color.white, TextAlignmentOptions.BottomRight)
-                            .Keep(out subscriptText)
-                        .Done
                     .Done
                     .GameObject;
         }
@@ -299,6 +302,7 @@ namespace Unfoundry
         public void Show(float start, float width, Sprite icon, string description, string subscript, CustomRadialMenuOption.ActivatedDelegate onActivated)
         {
             Description = description;
+            Subscript = subscript;
             OnActivated = onActivated;
 
             backgroundImage.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, -start * 360.0f);
@@ -310,16 +314,6 @@ namespace Unfoundry
             var iconCenter = new Vector2(Mathf.Sin(iconAngle), Mathf.Cos(iconAngle)) * iconCenterOffset;
             iconRectTransform.offsetMin = iconCenter - new Vector2(42.5f, 42.5f);
             iconRectTransform.offsetMax = iconCenter + new Vector2(42.5f, 42.5f);
-
-            if (string.IsNullOrWhiteSpace(subscript))
-            {
-                subscriptText.gameObject.SetActive(false);
-            }
-            else
-            {
-                subscriptText.text = subscript;
-                subscriptText.gameObject.SetActive(true);
-            }
 
             gameObject.SetActive(true);
         }

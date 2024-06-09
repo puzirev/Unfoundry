@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using static Unfoundry.Plugin;
 
@@ -104,6 +105,7 @@ namespace Unfoundry
             return true;
         }
 
+        private static readonly FieldInfo hoverWobbleModifier = typeof(CharacterJetpack).GetField("hoverWobbleModifier", BindingFlags.NonPublic | BindingFlags.Instance);
         [HarmonyPatch]
         public static class Patch
         {
@@ -133,6 +135,12 @@ namespace Unfoundry
                     }
 
                     customHandheldMode.UpdateBehavoir();
+
+                    var jetpack = __instance.relatedCharacter?.renderCharacter?.characterJetpack;
+                    if (jetpack != null)
+                    {
+                        hoverWobbleModifier.SetValue(jetpack, -Time.deltaTime);
+                    }
                 }
 
                 return false;

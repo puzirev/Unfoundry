@@ -114,10 +114,9 @@ namespace Unfoundry
         };
         public static float BoxRayIntersection(Vector3 from, Vector3 to, Ray ray, out Vector3Int normal, out int faceIndex)
         {
-            float dist;
-            if (new Bounds((from + to) * 0.5f, to - from).IntersectRay(ray, out dist))
+            if (new Bounds((from + to) * 0.5f, to - from).IntersectRay(ray, out _))
             {
-                float maxDistance = -1.0f;
+                var maxDistance = float.MinValue;
                 normal = Vector3Int.zero;
                 faceIndex = -1;
                 for (int i = 0; i < 6; ++i)
@@ -127,7 +126,7 @@ namespace Unfoundry
                         float distance;
                         if (new Plane(faceNormals[i], ((i & 1) == 0) ? to : from).Raycast(ray, out distance))
                         {
-                            if (maxDistance < 0.0f || distance > maxDistance)
+                            if (distance > maxDistance)
                             {
                                 maxDistance = distance;
                                 normal = faceNormals[i];
@@ -137,11 +136,71 @@ namespace Unfoundry
                     }
                 }
 
-                return dist;
+                return maxDistance;
             }
 
             faceIndex = -1;
             normal = new Vector3Int(0, 1, 0);
+            return -1.0f;
+        }
+
+        public static float BoxRayIntersection(Vector3 from, Vector3 to, Ray ray, out Vector3Int normal, out int faceIndex, out bool isInternal)
+        {
+            var bounds = new Bounds((from + to) * 0.5f, to - from);
+            if (bounds.Contains(ray.origin))
+            {
+                var minDistance = float.MaxValue;
+                normal = Vector3Int.zero;
+                faceIndex = -1;
+                for (int i = 0; i < 6; ++i)
+                {
+                    if (Vector3.Dot(faceNormals[i], ray.direction) > 0.0f)
+                    {
+                        float distance;
+                        if (new Plane(faceNormals[i], ((i & 1) == 0) ? to : from).Raycast(ray, out distance))
+                        {
+                            if (distance < minDistance)
+                            {
+                                minDistance = distance;
+                                normal = faceNormals[i];
+                                faceIndex = i;
+                            }
+                        }
+                    }
+                }
+
+                isInternal = true;
+                return minDistance;
+            }
+            else if (bounds.IntersectRay(ray, out var _))
+            {
+                var maxDistance = float.MinValue;
+                normal = Vector3Int.zero;
+                faceIndex = -1;
+                for (int i = 0; i < 6; ++i)
+                {
+                    if (Vector3.Dot(faceNormals[i], ray.direction) < 0.0f)
+                    {
+                        float distance;
+                        if (new Plane(faceNormals[i], ((i & 1) == 0) ? to : from).Raycast(ray, out distance))
+                        {
+                            if (distance > maxDistance)
+                            {
+                                maxDistance = distance;
+                                normal = faceNormals[i];
+                                faceIndex = i;
+                            }
+                        }
+                    }
+                }
+
+                isInternal = false;
+                return maxDistance;
+            }
+
+            faceIndex = -1;
+            normal = new Vector3Int(0, 1, 0);
+            isInternal = false;
             return -1.0f;
         }
 
