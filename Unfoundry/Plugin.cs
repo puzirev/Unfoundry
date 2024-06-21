@@ -25,7 +25,7 @@ namespace Unfoundry
             MODNAME = "Unfoundry",
             AUTHOR = "erkle64",
             GUID = AUTHOR + "." + MODNAME,
-            VERSION = "0.3.11";
+            VERSION = "0.3.12";
 
         private static readonly Dictionary<string, UnfoundryPlugin> _unfoundryPlugins = new Dictionary<string, UnfoundryPlugin>();
         private static Config _config = null;
@@ -233,14 +233,6 @@ namespace Unfoundry
 
                 return true;
             }
-
-            //[HarmonyPatch(typeof(GameRoot), nameof(GameRoot.addLockstepEvent))]
-            //[HarmonyPostfix]
-            //private static void GameRoot_addLockstepEvent(GameRoot.LockstepEvent e)
-            //{
-            //    Debug.Log("====== GameRoot.addLockstepEvent ======");
-            //    Debug.Log(e.getDbgInfo());
-            //}
         }
     }
 }

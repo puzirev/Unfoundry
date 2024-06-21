@@ -53,6 +53,10 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TinyJSON\TinyJSON\TinyJSON.csproj" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if not exist &quot;$(TargetModDir)&quot; mkdir &quot;$(TargetModDir)&quot;" />
     <Exec Command="copy /Y &quot;$(SolutionDir)Mod\*.*&quot; &quot;$(TargetModPath)&quot;" />
