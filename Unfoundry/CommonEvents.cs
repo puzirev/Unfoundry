@@ -51,6 +51,7 @@ namespace Unfoundry
         internal static void Update()
         {
             OnUpdate?.Invoke();
+            ActionManager.Update();
         }
 
         internal static void LateUpdate()
