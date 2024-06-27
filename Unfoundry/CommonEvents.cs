@@ -1,7 +1,30 @@
-﻿using HarmonyLib;
+﻿using C3;
+using HarmonyLib;
 
 namespace Unfoundry
 {
+    [AddSystemToGameSimulation]
+    public class CommonEventsSystem : SystemManager.System
+    {
+        [EventHandler]
+        public void HandleOnUpdate(OnUpdate _)
+        {
+            CommonEvents.Update();
+        }
+
+        [EventHandler]
+        public void HandleOnLateUpdate(OnLateUpdate _)
+        {
+            CommonEvents.LateUpdate();
+        }
+
+        [EventHandler]
+        public void HandleOnFixedUpdate(OnFixedUpdate _)
+        {
+            CommonEvents.FixedUpdate();
+        }
+    }
+
     public class CommonEvents
     {
         public delegate void GameInitializationDoneDelegate();
@@ -16,11 +39,29 @@ namespace Unfoundry
         public delegate void LateUpdateDelegate();
         public static event LateUpdateDelegate OnLateUpdate;
 
+        public delegate void FixedUpdateDelegate();
+        public static event FixedUpdateDelegate OnFixedUpdate;
+
         public delegate void RotateYDelegate(CancellableEventArgs eventArgs);
         public static event RotateYDelegate OnRotateY;
 
         public delegate void DeselectToolDelegate();
         public static event DeselectToolDelegate OnDeselectTool;
+
+        internal static void Update()
+        {
+            OnUpdate?.Invoke();
+        }
+
+        internal static void LateUpdate()
+        {
+            OnLateUpdate?.Invoke();
+        }
+
+        internal static void FixedUpdate()
+        {
+            OnFixedUpdate?.Invoke();
+        }
 
 
         [HarmonyPatch]
@@ -39,21 +80,6 @@ namespace Unfoundry
                 }
                 ActionManager.OnGameInitializationDone();
                 OnGameInitializationDone?.Invoke();
-            }
-
-            [HarmonyPatch(typeof(InputProxy), "Update")]
-            [HarmonyPostfix]
-            private static void Update()
-            {
-                OnUpdate?.Invoke();
-                ActionManager.Update();
-            }
-
-            [HarmonyPatch(typeof(GameRoot), "LateUpdate")]
-            [HarmonyPostfix]
-            private static void LateUpdate()
-            {
-                OnLateUpdate?.Invoke();
             }
 
             [HarmonyPatch(typeof(ResourceDB), nameof(ResourceDB.InitOnApplicationStart))]
