@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using C3.ModKit;
 using C3;
+using System.Linq;
 
 namespace Unfoundry
 {
@@ -31,7 +32,7 @@ namespace Unfoundry
         private static Config _config = null;
         private static TypedConfigEntry<int> _configMaxQueuedEventsPerFrame = null;
 
-        internal static Dictionary<string, UnityEngine.Object> bundleMainAssets;
+        internal static Dictionary<System.Type, Dictionary<string, UnityEngine.Object>> bundleMainAssets;
 
         private static string[] _texturesToRegister = new string[]
         {
@@ -110,9 +111,15 @@ namespace Unfoundry
 
         public static T GetAsset<T>(string name) where T : UnityEngine.Object
         {
-            if (!bundleMainAssets.TryGetValue(name, out var asset))
+            if (!bundleMainAssets.TryGetValue(typeof(T), out var assetDict))
             {
-                Debug.Log($"Missing asset '{name}'");
+                Debug.Log($"Missing asset dictionary for type '{typeof(T)}'");
+                return null;
+            }
+
+            if (!assetDict.TryGetValue(name, out var asset))
+            {
+                Debug.Log($"Missing asset with '{name}' and type '{typeof(T)}'");
                 return null;
             }
 
@@ -136,15 +143,38 @@ namespace Unfoundry
                     if (mod.modInfo.identifier == "erkle64.unfoundry")
                     {
                         Debug.Log("Unfoundry loading common assets.");
-                        bundleMainAssets = typeof(Mod).GetField("assets", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(mod) as Dictionary<string, UnityEngine.Object>;
-                        assetsFound = true;
-
-                        foreach (var textureName in _texturesToRegister)
+                        bundleMainAssets = new Dictionary<System.Type, Dictionary<string, Object>>();
+                        foreach (KeyValuePair<AssetBundle, global::UnityEngine.Object[]> keyValuePair in AssetManager.getAllLoadedAssetBundles())
                         {
-                            var texture = bundleMainAssets.LoadAsset<Texture2D>(textureName);
-                            if (texture == null) continue;
-                            ResourceExt.RegisterTexture(textureName, texture);
+                            if (!mod.modInfo.assetBundles.Any(s => keyValuePair.Key.name.Equals(s)))
+                                continue;
+                            global::UnityEngine.Object[] value = keyValuePair.Value;
+                            for (int i = 0; i < value.Length; i++)
+                            {
+                                Texture2D texture2D = value[i] as Texture2D;
+                                Debug.Log(string.Format("Unfoundry found {0} asset {1}, index={2}", texture2D == null ? "non-texture" : "texture", value[i], i));
+                                if (!bundleMainAssets.TryGetValue(value[i].GetType(), out var assetDict))
+                                {
+                                    assetDict = new Dictionary<string, Object>();
+                                    bundleMainAssets.Add(value[i].GetType(), assetDict);
+                                }
+
+                                if (assetDict.TryGetValue(value[i].name, out var currentVal))
+                                    Debug.Log($"Unfoundry already have registered asset with name '{value[i].name}' and type '{value[i].GetType()}': '{currentVal}'");
+                                else
+                                    assetDict.Add(value[i].name, value[i]);
+                                if (texture2D != null)
+                                {
+                                    if (_texturesToRegister.Any(s => texture2D.name.Equals(s)))
+                                    {
+                                        Debug.Log(string.Format("Unfoundry registering texture {0}", texture2D));
+                                        ResourceExt.RegisterTexture(texture2D.name, texture2D);
+                                    }
+                                }
+                            }
                         }
+
+                        assetsFound = true;
 
                         break;
                     }
